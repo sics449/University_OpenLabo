@@ -239,7 +239,7 @@ void ofApp::initGame() {
             myCom.x = myPlayer.x + 1;
             myCom.y = myPlayer.y;
             
-            // 💡【追加】チュートリアル開始時に、COMが保持している古い移動経路を完全に空にする
+            // チュートリアル開始時に、COMが保持している古い移動経路を完全に空にする
             myCom.currentPath.clear();
             
         }else{
@@ -351,8 +351,8 @@ void ofApp::initGame() {
     countdownTimer = 3.0;
     lastCountdownSeconds = 4;
     
-    // 💡【修正】直前で確定した新しい難易度の currentTilesize を使って、
-    // プレイヤーとCOMの描画座標（drawPos）を完全にここで上書き確定させます。
+    // 直前で確定した新しい難易度の currentTilesize を使って、
+    // プレイヤーとCOMの描画座標（drawPos）を完全にここで上書きを確定
     myPlayer.drawPos.set(myPlayer.x * currentTilesize, myPlayer.y * currentTilesize);
     myCom.drawPos.set(myCom.x * currentTilesize, myCom.y * currentTilesize);
     
@@ -361,7 +361,7 @@ void ofApp::initGame() {
     targetStep = (int)ofRandom(minStep, maxStep + 1);
     for (int i = 0; i < SKILL_COUNT; i++) skillStocks[i] = 0;
     
-    // --- 【変更】ここで距離マップを生成し、初期位置の距離を取得する ---
+    // --- ここで距離マップを生成し、初期位置の距離を取得する ---
     calculateDistanceMap();
     cachedPlayerPathLength = distanceMap[myPlayer.x][myPlayer.y];
     myComPathSizeCached = distanceMap[myCom.x][myCom.y];
@@ -422,7 +422,7 @@ void ofApp::update(){
         // 1. スライド位置の滑らかな計算 (線形補間/イージング)
         // 選択しているステージが画面中央 (X = 0) に来るように目標値を設定
         float targetOffsetX = -selectedLevel * stageSpacing;
-        // 毎フレーム、目標値に15%ずつ近づける（これでニュッとスライドします）
+        // 毎フレーム、目標値に15%ずつ近づける
         selectOffsetX += (targetOffsetX - selectOffsetX) * 0.15f;
         
         // 2. ホバータイマーの更新（動画切り替え用）
@@ -435,7 +435,7 @@ void ofApp::update(){
         }
         
         // ---------------------------------------------------------
-        // 💡 3. すべての通常ステージ(1〜3)の動画を一括制御・アップデート
+        //  3. すべての通常ステージ(1〜3)の動画を一括制御・アップデート
         // ---------------------------------------------------------
         for (int i = 0; i < 3; i++) {
             // 現在のカーソルが「上側ゾーン(0)」にあり、かつこのステージ(i)を指していて、2秒以上経っている場合
@@ -451,7 +451,7 @@ void ofApp::update(){
                 }
                 
             } else {
-                // 💡 カーソルが外れた、または2秒未満の場合は動画を安全に停止・巻き戻し
+                //  カーソルが外れた、または2秒未満の場合は動画を安全に停止・巻き戻し
                 if (stageVideos[i].isLoaded() && stageVideos[i].isPlaying()) {
                     stageVideos[i].stop();
                     stageVideos[i].firstFrame(); // 停止した時に最初の1コマ目（静止画状態）に巻き戻す
@@ -475,7 +475,7 @@ void ofApp::update(){
 
         if (countdownTimer <= 0) {
             isCountingDown = false;
-            seStart.play(); // 「ゴー！」という開始音
+            seStart.play(); // 開始音
             lastCountdownSeconds = 3; // 次回のためにリセット
         }
         
@@ -564,7 +564,7 @@ void ofApp::update(){
         bool canTriggerTrap = !isComFrozen;
 
         for (int i = (int)activeTraps.size() - 1; i >= 0; i--) {
-            // 💡 A. すでに作動中（足止め中）のトラップのタイマー更新
+            // すでに作動中（足止め中）のトラップのタイマー更新
             if (activeTraps[i].isActivated) {
                 if (currentState != QUIZ_MODE && currentState != RESULT_MODE) {
                     if (nowTime - activeTraps[i].timer > activeTraps[i].duration) {
@@ -577,7 +577,7 @@ void ofApp::update(){
                     activeTraps[i].timer += ofGetLastFrameTime() * 1000;
                 }
             }
-            // 💡 B. まだ踏まれていないトラップの当たり判定
+            // まだ踏まれていないトラップの当たり判定
             else if (canTriggerTrap && myCom.x == activeTraps[i].x && myCom.y == activeTraps[i].y) {
                 float targetX = activeTraps[i].x * currentTilesize;
                 float targetY = activeTraps[i].y * currentTilesize;
@@ -596,7 +596,7 @@ void ofApp::update(){
             }
         }
 
-        // 💡 C. COMの移動を制限する判定
+        // COMの移動を制限する判定
         // 「フリーズアイテムの効果中」または「いずれかのトラップが作動（足止め）中」ならCOMは動けない
         bool isComTotallyStopped = isComFrozen;
         for (const auto& trap : activeTraps) {
@@ -690,7 +690,7 @@ void ofApp::update(){
                 
                 myCom.update(ts, mapData, gridW, gridH);
                 
-                // 💡【重要】COMが動いた時だけ、距離とブースト判定を行う
+                // COMが動いた時だけ、距離とブースト判定を行う
                 if (myCom.x != oldComX || myCom.y != oldComY) {
                     myComPathSizeCached = distanceMap[myCom.x][myCom.y];
                     int playerDist = distanceMap[myPlayer.x][myPlayer.y];
@@ -713,30 +713,6 @@ void ofApp::update(){
 
             updateArrows();
 
-            /*// ---------------------------------------------------------
-            // 💡【毎フレーム実行】安全弁を取り払った、確実なON/OFFブースト判定
-            // ---------------------------------------------------------
-            // COMの距離には、毎フレーム消えてしまうsize()ではなく、常に安定しているキャッシュ(myComPathSizeCached)を使います
-            int pathComToGoal = myComPathSizeCached;
-            int pathPlayerToGoal = distanceMap[myPlayer.x][myPlayer.y];
-
-            // ゲーム開始直後などの未計算状態（0）でなければ、毎フレーム確実にON/OFFを切り替える
-            if (pathComToGoal > 0 && pathPlayerToGoal > 0) {
-                if (!isComBoostMode) {
-                    // プレイヤーが20マス以上「実際に」先行したらブーストON
-                    if (pathPlayerToGoal < pathComToGoal && (pathComToGoal - pathPlayerToGoal) >= 20) {
-                        isComBoostMode = true;
-                        seComBoost.play();
-                    }
-                } else {
-                    // COMが追いつく、または差が20未満になったら【毎フレーム確実に】即座にOFF
-                    // 安全弁を外したため、COMが前に出たら100%ここでブーストが切れます
-                    if (pathComToGoal <= pathPlayerToGoal || (pathComToGoal - pathPlayerToGoal) < 5) {
-                        isComBoostMode = false;
-                        seFinishBoost.play();
-                    }
-                }
-            }*/
 
             // -----------------------------------------------------------------
             // 2. プレイヤーの移動処理（キー入力）と歩数カウント
@@ -758,10 +734,10 @@ void ofApp::update(){
                 
                 myPlayer.move(dx, dy, gridW, gridH, mapData, ts);
                 
-                // 💡 壁にぶつかっておらず、実際に【1マス進むことに成功した瞬間】だけ中に入る
+                // 壁にぶつかっておらず、実際に【1マス進むことに成功した瞬間】だけ中に入る
                 if (myPlayer.x != oldX || myPlayer.y != oldY) {
                     
-                    // 🌟 プレイヤーが動いた瞬間に1回だけ、あなたのA*関数で残り歩数を計算
+                    // プレイヤーが動いた瞬間に1回だけ、あなたのA*関数で残り歩数を計算
                     cachedPlayerPathLength = distanceMap[myPlayer.x][myPlayer.y];
                     
                     // 通常の歩数カウント
@@ -787,8 +763,8 @@ void ofApp::update(){
                         targetStep = (int)ofRandom(minStep, maxStep);
                     }
                 }
-                // 💡 壁スタック時（キーを押しっぱなしで壁に当たり続けている時）に、
-                // 裏でA*が毎フレーム連打されて画面がカクつくのを防ぐため、タイマー更新を外側に出します
+                // 壁スタック時（キーを押しっぱなしで壁に当たり続けている時）に、
+                // 裏でA*が毎フレーム連打されて画面がカクつくのを防ぐため、タイマー更新を外側に出す
                 lastAnimTime = now;
             }
             
@@ -816,7 +792,7 @@ void ofApp::update(){
                     logger.endAndSaveStage(true);
                     sendText2server("--game clear--");
                     resultMessage = "ゴール!! あなたの勝ちです!";
-                    goalTime = ofGetElapsedTimeMillis(); // ★ゴールした時刻を記録
+                    goalTime = ofGetElapsedTimeMillis(); // ゴールした時刻を記録
                 }
                 
                 // COMのゴール判定
@@ -842,7 +818,7 @@ void ofApp::update(){
                     
                     if (c.type == 0) { // ランダムアイテム
                         int s = (int)ofRandom(1, 4); // DASH, FREEZE, TRAP
-                        if (skillStocks[s] < 3) skillStocks[s]++; // ★上限チェック
+                        if (skillStocks[s] < 3) skillStocks[s]++; // 上限チェック
                         lastGetItemType = s;
                     }
                     else if (c.type == 1) { // スタン
@@ -855,7 +831,7 @@ void ofApp::update(){
                         seStun.play();
                     }
                     else if (c.type == 2) { // タイムストップ
-                        if (skillStocks[TIME_STOP] < 2) skillStocks[TIME_STOP]++;// ★上限チェック
+                        if (skillStocks[TIME_STOP] < 2) skillStocks[TIME_STOP]++;// 上限チェック
                         lastGetItemType = TIME_STOP;
                     }
                     // --- ここから演出用セット ---
@@ -930,7 +906,7 @@ void ofApp::draw(){
         ofBackground(0);
         
         // 【解像度対策】画面の縦幅(screenH)を基準にして、タイルが縦に約10~11枚並ぶようにサイズを自動決定
-        // これにより、画面が大きくても小さくてもスカスカにならず、同じ見た目の迫力を維持できます。
+        
         currentTilesize = screenH / 11.0f;
         if (currentTilesize < 64) currentTilesize = 64; // 小さくなりすぎないように下限を設定
         
@@ -973,23 +949,23 @@ void ofApp::draw(){
         myCom.draw(currentTilesize);
         
         
-        // 💡 2. 画像の描画色を白（元の色のまま）に設定
+        // 2. 画像の描画色を白（元の色のまま）に設定
         ofSetColor(255, 255, 255, 255);
 
         // ドット絵ロゴの元のサイズ
         float originalW = 256.0f;
         float originalH = 160.0f;
 
-        // 💡 3. 画面の横幅（screenW）の 70% の大きさに拡大する計算（お好みで 0.7f を 0.8f などに調整してください）
+        // 3. 画面の横幅（screenW）の 70% の大きさに拡大する計算（お好みで 0.7f を 0.8f などに調整してください）
         float logoW = screenW * 0.4f;
         // 横幅の拡大比率に合わせて、縦幅もアスペクト比を維持して拡大
         float logoH = logoW * (originalH / originalW);
 
-        // 💡 4. 画面中央に配置するための座標計算
+        // 4. 画面中央に配置するための座標計算
         float logoX = (screenW / 2.0f) - (logoW / 2.0f);
-        float logoY = (screenH * 0.2f) - (logoH / 2.0f); // 画面の上から30%付近の中心に配置（背景の城やバランスを見て調整してください）
+        float logoY = (screenH * 0.2f) - (logoH / 2.0f); // 画面の上から30%付近の中心に配置
 
-        // 💡 5. タイトルロゴ画像を描画
+        // 5. タイトルロゴ画像を描画
         titleImg.draw(logoX, logoY, logoW, logoH);
         
         if (titleStep == 0) {
@@ -1108,7 +1084,7 @@ void ofApp::draw(){
         // タイトル文を画面上部（上から8%の位置）に配置
         myFont.drawString("あそびたいコースを えらんでね", screenW * 0.08f, screenH * 0.08f);
         
-        // 💡 1. 画面リスト用の「シンプルなコース名」の配列
+        // 1. 画面リスト用の「シンプルなコース名」の配列
         std::vector<std::string> ageLabels = {
             "がっこうにいくまえ コース",
             "しょうがく1ねんせい コース",
@@ -1119,7 +1095,7 @@ void ofApp::draw(){
             "中学生以上 コース"
         };
         
-        // 💡 2. 画面下部に切り替えて表示する「詳しいルール説明文」の配列
+        // 2. 画面下部に切り替えて表示する「詳しいルール説明文」の配列
         std::vector<std::string> ageDescriptions = {
             "[けいさんルール] 1から10までの たしざん と,かんたんな ひきざん が でるよ!",
             "[けいさんルール] 1けたの たしざん,ひきざん と,3つの 数の 計算も でるよ!",
@@ -1136,7 +1112,7 @@ void ofApp::draw(){
             ageDescriptions.push_back("[じぶんで設定] 演算子,ケタ数,九九制限などを じゆうに設定できるよ!");
         }
         
-        // --- 3. コース名リストの一覧描画（★bigFontを使い大画面でも迫力満点に！） ---
+        // --- 3. コース名リストの一覧描画 ---
         int maxChoices = ageLabels.size();
         
         // 画面の縦幅に合わせて行間を自動で均等割り付け（15%の位置から開始して60%の範囲に収める）
@@ -1175,7 +1151,7 @@ void ofApp::draw(){
         }
         
         // =====================================================================
-        // 💡 4. カーソルが合っているコースの説明文を画面下部に固定表示（レスポンシブ）
+        // 4. カーソルが合っているコースの説明文を画面下部に固定表示
         // =====================================================================
         if (ageCursor >= 0 && ageCursor < ageDescriptions.size()) {
             ofPushStyle();
@@ -1220,7 +1196,7 @@ void ofApp::draw(){
         
         ofPushStyle();
         // 説明文の座布団（bgY = screenH * 0.78f, bgH = screenH * 0.10f）のすぐ下、
-        // 画面の最下部（上から91%の位置）にさりげなく、でも見やすく配置
+        // 画面の最下部（上から91%の位置）に
         float adviceX = screenW * 0.05f;
         float adviceY = screenH * 0.91f;
         
@@ -1231,7 +1207,7 @@ void ofApp::draw(){
         ofPopStyle();
         
         // =====================================================================
-        // 【修正】年齢確認ポップアップの描画処理（コントローラーデザインに完全リニューアル）
+        // 年齢確認ポップアップの描画処理
         // =====================================================================
         if (isAgeConfirmed) {
             ofPushStyle();
@@ -1302,7 +1278,7 @@ void ofApp::draw(){
         string opLabels[] = {"たしざん", "ひきざん", "かけざん", "わりざん"};
         bool opFlags[] = {useAdd, useSub, useMul, useDiv};
         
-        // 💡 新しい制限モードのテキスト
+        // 新しい制限モードのテキスト
         string limitTexts[] = {"九九のみ", "小5から6年基準", "制限なし"};
         
         // 画面の解像度に合わせて項目の開始位置と間隔を自動計算
@@ -1514,13 +1490,13 @@ void ofApp::draw(){
         float centerX = screenW / 2.0f;
         float centerY = screenH / 2.0f;
         
-        // 💡 画面サイズに合わせて、プレビュー画像のサイズをレスポンシブに計算
+        //  画面サイズに合わせて、プレビュー画像のサイズをレスポンシブに計算
         // (例: 1920x1080なら w=800, h=480 のバランスを維持)
         float imgW = screenW * 0.416f;
         float imgH = screenH * 0.444f;
         
         // ---------------------------------------------------------
-        // ★ guideText を完璧に中央寄せして描画する処理 (textGrowを使用)
+        // guideText を完璧に中央寄せして描画する処理 (textGrowを使用)
         // ---------------------------------------------------------
         string guideText = "ステージを スティックでえらんで,しろいボタンでけってい";
         
@@ -1539,7 +1515,7 @@ void ofApp::draw(){
         myFont.drawString(guideText, textX, textY);
         
         // =========================================================
-        // ★ 画面全体を横スライドさせるための行列プッシュ
+        // 画面全体を横スライドさせるための行列プッシュ
         // =========================================================
         ofPushMatrix();
         
@@ -1567,7 +1543,7 @@ void ofApp::draw(){
             
             if (i == 3) {
                 // ---------------------------------------------------------
-                // 💡 EX (VERY HARD) の特殊描写（灰色の画面にガタガタ動く「？」）
+                // EX (VERY HARD) の特殊描写（灰色の画面にガタガタ動く「？」）
                 // ---------------------------------------------------------
                 if (isCurrentSelected) {
                     ofSetColor(140, 140, 140, 255); // 選択中は明るい灰色
@@ -1593,7 +1569,7 @@ void ofApp::draw(){
                 
             } else {
                 // ---------------------------------------------------------
-                // 💡 通常ステージ (1〜3) の描写 (1.5秒経過で動画再生)
+                // 通常ステージ (1〜3) の描写 (1.5秒経過で動画再生)
                 // ---------------------------------------------------------
                 if (isCurrentSelected) {
                     ofSetColor(255, 255, 255, 255); // 本来の明るさ
@@ -1611,7 +1587,7 @@ void ofApp::draw(){
             }
             
             // ---------------------------------------------------------
-            // 💡 【修正】被り防止：ステージ名・星（画像）を下側へシフトして描画
+            // 被り防止：ステージ名・星（画像）を下側へシフトして描画
             // ---------------------------------------------------------
             // テキストを表示する基準Y座標（拡大された枠「h/2」の下端からさらに余裕を持たせる）
             float textBaseY = y + (h / 2) + 45;
@@ -1725,7 +1701,7 @@ void ofApp::draw(){
         ofPopMatrix(); // 横スライドの行列を終了 (これ以降は画面の定位置に固定描画されます)
         
         // =========================================================
-        // ★ 画面下部：下側ゾーン（れんしゅう ＆ もどる）の描画
+        // 画面下部：下側ゾーン（れんしゅう ＆ もどる）の描画
         // =========================================================
         float bottomY = screenH - 70; // 下側アイテムのY座標（画面最下部から70px上）
         float screenCenterX = screenW / 2.0f;
@@ -1801,13 +1777,13 @@ void ofApp::draw(){
         }
         
         // =========================================================
-        // ★【修正】上下移動をナビゲートする矢印（大型化 ＆ 本来の色で描画）
+        // 上下移動をナビゲートする矢印（大型化 ＆ 本来の色で描画）
         // =========================================================
         float arrowX = screenCenterX;
         float arrowFloatY = sinf(ofGetElapsedTimef() * 6.0f) * 5.0f; // フワフワ感を少し強めに
         
-        int arrowW = 72; // 💡 50から72に大型化！
-        int arrowH = 72; // 💡 50から72に大型化！
+        int arrowW = 72; 
+        int arrowH = 72; 
         int arrowSubX = ((fmod(ofGetElapsedTimef(), 0.7f) < 0.5f) ? 0 : (fmod(ofGetElapsedTimef(), 0.7f) < 0.6f ? 1 : 2)) * 32;
         
         if (selectVerticalZone == 0) {
@@ -1815,7 +1791,7 @@ void ofApp::draw(){
             // 拡大したプレビュー（imgH * 1.1f）や移動したテキストに被らないよう、位置を bottomY から逆算
             float ay = bottomY - 65 + arrowFloatY;
             
-            ofSetColor(255); // 💡 矢印本来のオリジナル色で描画
+            ofSetColor(255); // 矢印本来のオリジナル色で描画
             ofPushMatrix();
             ofTranslate(arrowX, ay);
             ofRotateDeg(180); // 180度回転して下向きにする
@@ -1957,13 +1933,13 @@ void ofApp::draw(){
         
         for (const auto& trap : activeTraps) {// トラップ描画
             // 画面内に入っているかの簡易チェック（カメラのスクロール等があれば合わせる）
-            // 既存の描画ロジックに合わせて、座標に currentTilesize（または ts）を掛けて描画します
+            // 既存の描画ロジックに合わせて、座標に currentTilesize（または ts）を掛けて描画
             float tx = trap.x * currentTilesize;
             float ty = trap.y * currentTilesize;
             
-            // まだ踏まれていない場合は通常表示、作動中の場合は少し半透明にするなど表現を変えても面白いです
+            
             if (!trap.isActivated) {
-                // 💡 まだ作動していない（設置されただけ）のとき
+                // まだ作動していない（設置されただけ）のとき
                 // マップタイルの上に、ちょっと暗い（または少し青み・赤みがかった）色をうっすら重ねる
                 ofSetColor(255, 0, 0, 40); //薄い赤
                 ofDrawRectangle(tx, ty, currentTilesize, currentTilesize);
@@ -1990,11 +1966,10 @@ void ofApp::draw(){
         ofSetColor(255,255,255,255);
         // --- COMの描画 ---
         if (isComFrozen) {
-            // 💡 フリーズ状態のとき：水色（R:100, G:200, B:255）を透明度180で重ねる
-            // ※色の強さはお好みに合わせて調整してください（255が最大）
+            // フリーズ状態のとき：水色（R:100, G:200, B:255）を透明度180で重ねる
             ofSetColor(100, 200, 255, 180);
             myCom.draw(currentTilesize);
-            ofSetColor(255); // 💡 重要：描き終わったらすぐに白色（色ブレンドなし）に戻す！
+            ofSetColor(255); // 描き終わったらすぐに白色（色ブレンドなし）に戻す！
         }else if(isComBoostMode){
             ofSetColor(255, 0, 0, 180);
             myCom.draw(currentTilesize);
@@ -2070,10 +2045,10 @@ void ofApp::draw(){
         if (isDashStunned) {
             // プレイヤーの頭上の座標を計算
             float piyoX = myPlayer.x * currentTilesize + (currentTilesize / 2);
-            float piyoY = myPlayer.y * currentTilesize - 24; // 頭上24ピクセル上（お好みで調整してください）
+            float piyoY = myPlayer.y * currentTilesize - 24; // 頭上24ピクセル上
             
-            // ★アニメーションのコマ数（インデックス）を計算する
-            // 15フレーム（約0.25秒）ごとにコマを進める例。3枚並びなので「% 3」で 0, 1, 2 をループさせます。
+            // アニメーションのコマ数（インデックス）を計算する
+            // 15フレーム（約0.25秒）ごとにコマを進める例。3枚並びなので「% 3」で 0, 1, 2 をループ
             int currentFrame = (ofGetFrameNum() / 15) % 3;
             
             // 1コマのサイズ
@@ -2090,13 +2065,6 @@ void ofApp::draw(){
             // 描画の中心をプレイヤーの頭上に移動
             ofTranslate(piyoX, piyoY);
             
-            // もし画像自体をさらに回したい場合は ofRotateDeg を残し、
-            // コマ送りアニメーションだけで表現したい場合は、下の ofRotateDeg の行を消してください。
-            // ofRotateDeg(ofGetFrameNum() * 2);
-            
-            // ★部分切り出し描画関数 (drawSubsection)
-            // 引数: (描画するX, 描画するY, 描画する幅, 描画する高さ, 画像内の切り出し開始X, 画像内の切り出し開始Y, 切り出す幅, 切り出す高さ)
-            // 中心を基準にするため、描画座標を「-frameW/2, -frameH/2」にずらす
             piyoImg.drawSubsection(-frameW / 2, -frameH / 2, frameW, frameH, srcX, srcY, frameW, frameH);
             
             ofPopMatrix();
@@ -2104,7 +2072,7 @@ void ofApp::draw(){
         
         
         if(isPaused){
-            // 💡 カメラがズレている分（-offsetX, -offsetY）を基準(0,0)とみなすことで、画面固定にする
+            // カメラがズレている分（-offsetX, -offsetY）を基準(0,0)とみなすことで、画面固定にする
             float screenLeft = -offsetX;
             float screenTop  = -offsetY;
             
@@ -2175,7 +2143,6 @@ void ofApp::draw(){
             // 文字のサイズに合わせて中央寄せ（数値は適宜調整してください）
             myFont.drawString(displayNum, ofGetWidth()/2 - 20, ofGetHeight()/2);
             
-            // 「READY?」などの文字も入れるとかっこいいです
             myFont.drawString("さきにたからのやまにたどり着け!!", ofGetWidth()/2 - 300, ofGetHeight()/2 - 160);
             
             ofPopStyle();
@@ -2232,7 +2199,7 @@ void ofApp::draw(){
                 float row1 = winY + 160;
                 float row2 = winY + 250;
                 
-                // 【修正】キー入力ロジック（1=A, 2=B, 3=C, 4=D）とボタン順序・色を完全一致
+                // キー入力ロジック（1=A, 2=B, 3=C, 4=D）とボタン順序・色を完全一致
                 // Aボタン (キー1 / 赤)
                 drawColorButton(col1, row1, "A", colorA, currentQuestion.choices[0]);
                 // Bボタン (キー2 / 青)
@@ -2247,7 +2214,7 @@ void ofApp::draw(){
                 bigFont.drawString(currentQuestion.text, winX + 50, winY + 90);
                 
                 // =======================================================
-                // ★ 演出が終わっており、かつ5秒経過している場合にウィンドウ内に描画
+                // 演出が終わっており、かつ5秒経過している場合にウィンドウ内に描画
                 // =======================================================
                 if (showHintButton) {
                     ofPushStyle();
@@ -2260,7 +2227,7 @@ void ofApp::draw(){
                         // --- 【まだヒントを押していない時】：四角い赤いボタンと案内を表示 ---
                         ofSetColor(255, 255, 255); // 赤色
                         ofFill();
-                        // 【修正】丸から、統一感を持たせるため一辺30pxの四角形ボタンに変更
+                        
                         ofDrawRectangle(hintX - 15, hintY - 15, 30, 30);
                         
                         ofSetColor(255, 255, 255); // 白色文字
@@ -2300,7 +2267,6 @@ void ofApp::draw(){
             
             float startTextX = winX + 50;
             
-            // 【修正】ゲーム終了時（ゴール時）は、通常のアイテム獲得メッセージを一切描画しない！
             if (!isGameCleared && !isGameFailed) {
                 
                 // アイコン画像と後半の文字がある場合（正解して新しくスキルをゲットした時）の連結処理
@@ -2317,7 +2283,7 @@ void ofApp::draw(){
                     // X座標：開始位置 + 2行目の文字の横幅 + 隙間10px
                     float currentX = startTextX + myFont.stringWidth(row2Text) + 10;
                     
-                    // ★【真ん中：アイコンの描画】
+                    //【真ん中：アイコンの描画】
                     float iconSize = 40;
                     float iconY = textY + 15;
                     
@@ -2328,7 +2294,7 @@ void ofApp::draw(){
                     // さらに右にずらす
                     currentX += iconSize + 10;
                     
-                    // ★【後半：後ろのメッセージを描画】
+                    //【後半：後ろのメッセージを描画】
                     myFont.drawString(resultMessageEnd, currentX, textY + 45);
                     
                 } else {
@@ -2336,7 +2302,7 @@ void ofApp::draw(){
                     myFont.drawString(resultMessage, startTextX, winY + 60);
                 }
                 
-                // --- 【追加】右下の次へ進むための白ボタン（フェード枠エフェクト） ---
+                // --- 右下の次へ進むための白ボタン（フェード枠エフェクト） ---
                 // 次の入力（Enterキー）を待つ通常の正誤画面のときだけ右下に表示
                 float bx = winX + winW - 140;  // ウィンドウの右端から少し内側
                 float by = winY + winH - 50;  // ウィンドウの下側付近
@@ -2530,7 +2496,7 @@ void ofApp::draw(){
         myFont.drawString("(" + ofToString(correctAnswers) + " / " + ofToString(totalQuestions) + ")", ofGetWidth()/2 - 60, 350);
         
         // =====================================================================
-        // 💡 【追加】Hard(selectedLevel == 2) でクリアした時だけの隠しコマンドヒント
+        // Hard(selectedLevel == 2) でクリアした時だけの隠しコマンドヒント
         // =====================================================================
         if (selectedLevel == 2 && isGameCleared) {
             ofSetColor(50, 255, 150); // 明るいミントグリーン（目立つ色）
@@ -2538,7 +2504,7 @@ void ofApp::draw(){
             myFont.drawString(secretHint, ofGetWidth()/2 - 480, 410); // 選択肢の少し上に表示
         }
         
-        // 選択肢（オープンラボ用構成）
+        // 選択肢
         string menu[] = {"もういちどプレイする", "ステージせんたくにもどる", "もんだいのむずかしさをかえる", "ゲームをやめる"};
         for (int i = 0; i < 4; i++) {
             // 文字を描画する基準の座標
@@ -2678,13 +2644,13 @@ void ofApp::keyPressed(int key){
     // =====================================================================
     else if (currentState == AGE_SELECT_MODE) {
         
-        // 💡 1. 入力されたキーを履歴に追加し、最大15回分に制限
+        // 1. 入力されたキーを履歴に追加し、最大15回分に制限
         inputHistory.push_back(key);
         if (inputHistory.size() > 15) {
             inputHistory.erase(inputHistory.begin());
         }
         
-        // 💡 2. 年齢選択画面用の隠しコマンド判定（vector<int> ageSecretCommand との比較）
+        // 2. 年齢選択画面用の隠しコマンド判定（vector<int> ageSecretCommand との比較）
         if (inputHistory.size() >= ageSecretCommand.size()) {
             bool match = true;
             for (int i = 0; i < ageSecretCommand.size(); i++) {
@@ -2702,7 +2668,7 @@ void ofApp::keyPressed(int key){
             }
         }
         
-        // 💡 選択肢の最大数（通常は7、カスタム解放時は8項目）
+        // 選択肢の最大数（通常は7、カスタム解放時は8項目）
         int maxChoices = showCustomMode ? 8 : 7;
         
         // --- 年齢確認ポップアップが出ている間のキー操作 ---
@@ -2715,13 +2681,13 @@ void ofApp::keyPressed(int key){
                 // 【重要】別の画面に遷移するので、一度入力履歴を綺麗にする
                 inputHistory.clear();
                 
-                // 💡 カスタムモードが選ばれた場合
+                // カスタムモードが選ばれた場合
                 if (showCustomMode && ageCursor == 7) {
                     logger.setup(7);
                     currentState = DIFFICULTY_CONFIG_MODE;
                     configCursor = 0;
                 }
-                // 💡 通常の学年コースが選ばれた場合
+                // 通常の学年コースが選ばれた場合
                 else {
                     logger.setup(ageCursor);
                     setRecommendedSettings(ageCursor);
@@ -2772,7 +2738,7 @@ void ofApp::keyPressed(int key){
             if (key == OF_KEY_RETURN) {
                 seChoose.play();
                 if (confirmCursor) {
-                    // 💡 カスタムで決定された桁数やマイナス設定をシステムに最終同期
+                    // カスタムで決定された桁数やマイナス設定をシステムに最終同期
                     maxNumLimit = pow(10, maxDigits) - 1;
                     allowNegative = (minDigits < 0);
                     
@@ -2910,7 +2876,7 @@ void ofApp::keyPressed(int key){
         if (key == OF_KEY_DOWN) {
             if (selectVerticalZone == 0) {
                 selectVerticalZone = 1; // スクショ選択（上側）から下側ゾーンへ移動
-                selectedBottomLevel = 0; // 💡 下に降りた時は、まず左側の「れんしゅう」に合わせる
+                selectedBottomLevel = 0; // 下に降りた時は、まず左側の「れんしゅう」に合わせる
                 seSelect.play();
             }
         }
@@ -2933,7 +2899,7 @@ void ofApp::keyPressed(int key){
             }
         }
         else if (selectVerticalZone == 1) {
-            // ─── 💡【下側ゾーン】：専用変数 selectedBottomLevel を左右で切り替え ───
+            // ───【下側ゾーン】：専用変数 selectedBottomLevel を左右で切り替え ───
             // 0 = れんしゅう, 1 = もんだいせっていにもどる
             if (key == OF_KEY_LEFT) {
                 if (selectedBottomLevel > 0) {
@@ -2983,11 +2949,11 @@ void ofApp::keyPressed(int key){
                 }
             }
             else if (selectVerticalZone == 1) {
-                // ─── 💡【下側：れんしゅう または もどる の決定】 ───
+                // ───【下側：れんしゅう または もどる の決定】 ───
                 if (selectedBottomLevel == 0) {
                     selectedLevel = 3;
                     initGame();
-                    // 🟢 【左側：れんしゅうの開始処理】
+                    //【左側：れんしゅうの開始処理】
                     sendText2server("--start tutorial--");
                     previousModeBeforeTutorial = currentState;
                     currentState = TUTORIAL_MODE;
@@ -2999,7 +2965,7 @@ void ofApp::keyPressed(int key){
                     selectedLevel = 0;
                 }
                 else if (selectedBottomLevel == 1) {
-                    // 🟡 【右側：「もどる」の決定処理】
+                    // 【右側：「もどる」の決定処理】
                     selectVerticalZone = 0; // ゾーンを初期値に戻しておく
                     selectedLevel = 0;      // ステージ選択位置もリセット
                     if (ageCursor == 7 && showCustomMode) {
@@ -3025,7 +2991,7 @@ void ofApp::keyPressed(int key){
         // --- MAP_MODE 中に 'q' が押されたらポーズ ---
         if (currentState == MAP_MODE) {
             if (isPaused) {
-                    // 💡 ポーズ中のキー入力処理はここにまとめる
+                    // ポーズ中のキー入力処理はここにまとめる
                     if (key == 'q') {
                         isPaused = false;       // ゲームに戻る
                         seSelect.play();        // 効果音（お好みで変更してください）
@@ -3050,14 +3016,14 @@ void ofApp::keyPressed(int key){
                     }
                 }
             else {
-                // 💡 通常プレイ中（ポーズしていないとき）のキー入力処理
+                // 通常プレイ中（ポーズしていないとき）のキー入力処理
                 if (key == 'q') {
                     isPaused = true;        // ポーズ画面を開く
                     seSelect.play();        // メニューを開く効果音
                     return;
                 }
                 
-                // ここから下に、普段のプレイヤーの移動処理（十字キーなど）が続くようにします
+                // ここから下に、普段のプレイヤーの移動処理（十字キーなど）が続くように
             }
         }
         if(isPaused) return;
@@ -3126,7 +3092,7 @@ void ofApp::keyPressed(int key){
                 }
                 
                 if(skillStocks[TRAP] > 0){
-                    // 💡 修正：いまプレイヤーがいる足元に、すでにトラップがあるかチェックする
+                    // いまプレイヤーがいる足元に、すでにトラップがあるかチェックする
                     bool isAlreadyTrapExist = false;
                     for (const auto& trap : activeTraps) {
                         if (trap.x == myPlayer.x && trap.y == myPlayer.y) {
@@ -3139,7 +3105,7 @@ void ofApp::keyPressed(int key){
                     if (!isAlreadyTrapExist) {
                         activateTrap();      // トラップ設置（上限を超えていれば一番古いやつを消す）
                         
-                        // ★【追加】TRAP (足元に罠がなく、設置に成功した時だけ記録)
+                        //【追加】TRAP (足元に罠がなく、設置に成功した時だけ記録)
                         logger.recordItemUse(static_cast<int>(TRAP) - 1);
                         
                         skillStocks[TRAP]--; // 設置が成功したときだけ消費する
@@ -3153,7 +3119,7 @@ void ofApp::keyPressed(int key){
     }
     
     else if (currentState == QUIZ_MODE) {
-        if (isQuizShowReady) return; // 演出中はキー入力を無視！
+        if (isQuizShowReady) return; // 演出中はキー入力を無視
         int selection = -1;
         if (key == '1') selection = 0;
         if (key == '2') selection = 1;
@@ -3197,7 +3163,7 @@ void ofApp::keyPressed(int key){
                 if (skillStocks[getIdx] < maxStock) {
                     skillStocks[getIdx]++;
                     
-                    // ★【ここがポイント】メッセージを2つに分割して保存する！
+                    // メッセージを2つに分割して保存する
                     resultMessage = "せいかい!\n[" + skillNames[getIdx];
                     resultMessageEnd = "] を 手に入れた！";
                     gainedSkillType = getIdx; // 絵を出すためにIDを記録
@@ -3536,7 +3502,7 @@ void ofApp::generateMap() {
             }
         }
         
-        // ★重要：roomsが空だとinitGameの処理が走らないので、ダミーを入れる
+        // roomsが空だとinitGameの処理が走らないので、ダミーを入れる
         BspRect tutorialRoom = {1, 1, gridW - 2, gridH - 2};
         rooms.push_back(tutorialRoom);
         // プレイヤーとCOMの初期位置
@@ -3720,7 +3686,7 @@ void ofApp::generateMap() {
         if (GoalX >= gridW - 2) GoalX = gridW - 3;
         if (GoalY >= gridH - 2) GoalY = gridH - 3;
 
-        // ★重要：ここで初めて mapData に 3 を書き込む
+        // ここで初めて mapData に 3 を書き込む
         mapData[GoalX][GoalY] = 3;
 
         myCom.goalX = GoalX;
@@ -3766,7 +3732,7 @@ void ofApp::generateMap() {
             isFloor = (mapData[rx][ry] == floorTile);
         }
         
-        // ★ 修正点：ゴールの描画範囲 2x2 (GoalX~X+1, GoalY~Y+1) に重ならないようにする
+        // 修正点：ゴールの描画範囲 2x2 (GoalX~X+1, GoalY~Y+1) に重ならないようにする
         bool inGoalArea = (rx >= GoalX && rx <= GoalX + 1 && ry >= GoalY && ry <= GoalY + 1);
         bool inStartPos = (rx == myPlayer.x && ry == myPlayer.y);
         
@@ -4288,12 +4254,12 @@ void ofApp::setupMathQ() {
     }
     
     // =======================================================
-    // 💡 5. 知育ヒント生成システム (定義位置を最上部に修正)
+    // 5. 知育ヒント生成システム (定義位置を最上部に修正)
     // =======================================================
     quizHintGraph = "";
     quizHintText = "";
     
-    // --- 🌟【重要】すべてのブロックで安全に使うため、関数の一番上で定義します ---
+    // ---【重要】すべてのブロックで安全に使うため、関数の一番上で定義 ---
     vector<long long> extractedNumbers;
     string tempNumStr = "";
     for (size_t i = 0; i < currentQuestion.text.length(); i++) {
@@ -4329,7 +4295,7 @@ void ofApp::setupMathQ() {
             // 直前の1文字を取得
             char prevChar = currentQuestion.text[mPos - 1];
             
-            // "÷" はマルチバイトなので、文字単体での比較ではなく、文字列全体の直前の位置に "÷" がないかで安全に判定します
+            // "÷" はマルチバイトなので、文字単体での比較ではなく、文字列全体の直前の位置に "÷" がないか
             bool isAfterOp = (prevChar == '(' || prevChar == 'x' || prevChar == '+');
             if (mPos >= 2 && currentQuestion.text.substr(mPos - 2, 2) == "÷") {
                 isAfterOp = true;
@@ -4360,7 +4326,7 @@ void ofApp::setupMathQ() {
     
     // --- 【2】 条件に応じたヒント生成 ---
     if (isComplexQuestion) {
-        // --- 🌟 【3項以上の計算】 ---
+        // --- 【3項以上の計算】 ---
         if (extractedNumbers.size() < 3) {
             quizHintGraph = currentQuestion.text;
             quizHintText = "[ヒント]\nカッコの なかや,「x」「÷」の\n計算から さきに やってみよう！";
@@ -4473,7 +4439,7 @@ void ofApp::setupMathQ() {
             quizHintText = hint;
         }
         else {
-            // 🌟【ここに記述】1〜10 の範囲なら「o」の図解を出す
+            //【ここに記述】1〜10 の範囲なら「o」の図解を出す
             if (a >= 1 && a <= 10 && b >= 1 && b <= 10 && (a + b) <= 10) {
                 string graph = "[図解ヒント]\n";
                 graph += "【 " + ofToString(a) + " 】 のまる：\n";
@@ -4517,7 +4483,7 @@ void ofApp::setupMathQ() {
             quizHintText = "[ヒント]\nひく数のほうが大きいから、\n答えは「マイナス」になるよ！\n大きな数から小さな数を引いて,\n頭に「-」をつけよう！\n計算： " + ofToString(b) + " - " + ofToString(a);
         }
         else {
-            // 🌟【ここに記述】1〜10 の範囲なら「o」が「x」に変わる図解を出す
+            //【ここに記述】1〜10 の範囲なら「o」が「x」に変わる図解を出す
             if (a >= 1 && a <= 10 && b >= 1 && b <= 10 && a >= b) {
                 string graph = "[図解ヒント]\n";
                 graph += "ぜんぶの " + ofToString(a) + " 個から " + ofToString(b) + " 個ひくよ\n";
@@ -4688,7 +4654,7 @@ void ofApp::drawArrows(int startX, int endX, int startY, int endY) {
 
     // 1. COMへの矢印
     if (comArrowSheet.isAllocated()) {
-        // ★Yの計算が合っていた基準（マス目の差分ベクトル）をそのまま利用
+        // Yの計算が合っていた基準（マス目の差分ベクトル）をそのまま利用
         float diffX = (myCom.x - myPlayer.x) * currentTilesize;
         float diffY = (myCom.y - myPlayer.y) * currentTilesize;
 
@@ -4704,7 +4670,7 @@ void ofApp::drawArrows(int startX, int endX, int startY, int endY) {
             // --- 交点計算（Xの反転・ズレを修正） ---
             if (abs(diffX) * borderY > abs(diffY) * borderX) {
                 // 左右の壁にぶつかる場合
-                // ★diffXの向き（正負）に合わせて、画面の「右端」か「左端」かを厳密に指定
+                // diffXの向き（正負）に合わせて、画面の「右端」か「左端」かを厳密に指定
                 if (diffX > 0) {
                     arrowX = screenCenterX + borderX; // 右の画面端
                 } else {
@@ -4717,7 +4683,7 @@ void ofApp::drawArrows(int startX, int endX, int startY, int endY) {
                 if (diffY > 0) arrowY = screenCenterY + borderY; // 下端
                 else           arrowY = screenCenterY - borderY; // 上端
                 
-                // ★上下の壁にいるときの、X座標の引っ張られ方の向きを正しく修正
+                // 上下の壁にいるときの、X座標の引っ張られ方の向きを正しく修正
                 arrowX = screenCenterX + borderY * (diffX / abs(diffY));
             }
 
@@ -4803,7 +4769,7 @@ void ofApp::checkAndDrawComAlert() {
     else return; // チュートリアル（レベル3）などは対象外
 
     // -----------------------------------------------------------------
-    // ★修正のコア：COMの残り探索ルートの要素数（＝実際の残り歩数）をダイレクトに取得
+    // 修正のコア：COMの残り探索ルートの要素数（＝実際の残り歩数）をダイレクトに取得
     // -----------------------------------------------------------------
     int comActualDistance = myComPathSizeCached;
 
@@ -4860,7 +4826,6 @@ void ofApp::checkAndDrawComAlert() {
         alertTextX -= 5.0f; // テロップが左へ流れる速度
 
         // 文字が画面の左外端に完全に消え去ったら、アニメーションの「描画」だけを終了
-        //（hasFiredLevelAlertはtrueのままなので再発火はしません）
         if (alertTextX < -textWidth) {
             isComNearGoalAlert = false;
         }
@@ -4911,7 +4876,7 @@ void ofApp::activateTrap() {
         }
     }
 
-    // ⭐【仕様変更】もし作動していない罠がすでに3つあるなら、一番古いやつを1つ消す
+    //【仕様変更】もし作動していない罠がすでに3つあるなら、一番古いやつを1つ消す
     if (unactivatedCount >= MAX_TRAPS && oldestUnactivatedIndex != -1) {
         activeTraps.erase(activeTraps.begin() + oldestUnactivatedIndex);
     }
@@ -4991,7 +4956,7 @@ int ofApp::getPlayerPathLength(int startX, int startY, int gX, int gY) {
     
     priority_queue<Node, vector<Node>, greater<Node>> pq;
     
-    // ★軽量化の肝：静的（static）な1次元配列を使い、メモリ確保を最初の一回だけにする
+    // 静的（static）な1次元配列を使い、メモリ確保を最初の一回だけにする
     // 160*160 = 25600 以上の固定サイズを用意（動的確保を無くして劇的に高速化）
     static bool visitedStatic[165][165];
     // 配列の初期化（memsetはvectorの初期化より圧倒的に高速です）
@@ -5032,7 +4997,7 @@ int ofApp::getPlayerPathLength(int startX, int startY, int gX, int gY) {
             if (nx >= 0 && nx < currentW && ny >= 0 && ny < currentH) {
                 // 壁（1）ではなく、まだ訪問していないマスだけを探索
                 if (mapData[nx][ny] != 1 && !visitedStatic[nx][ny]) {
-                    // ★ココで訪問済みにする（重複登録を防いで超軽量化）
+                    // ココで訪問済みにする（重複登録を防いで超軽量化）
                     visitedStatic[nx][ny] = true;
                     int nextG = current.g + 1;
                     pq.push({nx, ny, nextG, getH(nx, ny, gX, gY)});
@@ -5042,7 +5007,6 @@ int ofApp::getPlayerPathLength(int startX, int startY, int gX, int gY) {
     }
     
     // ゴールに届かなかった場合は、実際の迂回コストを大雑把にシミュレートした値を返す
-    // これにより、COMの実際の経路（pathComToGoal）と基準が綺麗に噛み合います
     return bestG + minH;
 }
 
