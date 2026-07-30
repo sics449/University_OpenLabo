@@ -28,16 +28,16 @@ void Com::findPath(vector<vector<int>>& map, int gridW, int gridH) {
     currentPath.clear();
     priority_queue<Node, vector<Node>, greater<Node>> pq;
     
-    // ★改善点1: 経路計算ごとにランダムな「寄り道度（探索のブレ）」を生成
-    // 毎回同じ経路を完璧に選ぶのを防ぎ、人間らしい「迷い」を生みます
+    // 経路計算ごとにランダムな「寄り道度（探索のブレ）」を生成
+    // 毎回同じ経路を完璧に選ぶのを防ぎ、人間らしい「迷い」を
     float pathNoise = ofRandom(0.8f, 1.8f);
 
     auto getH = [&](int tx, int ty) {
         // マンハッタン距離
         int baseDist = (abs(goalX - tx) + abs(goalY - ty)) * 10;
         
-        // ★改善点2: ゴール付近では正確に、遠くではノイズ（pathNoise）の影響を強くする
-        // これにより、プレイヤーが遠くにいる（行き止まり等にいる）時はCOMがルートを「見誤る」ようになります
+        // ゴール付近では正確に、遠くではノイズ（pathNoise）の影響を強くする
+        // これにより、プレイヤーが遠くにいる（行き止まり等にいる）時はCOMがルートを「見誤る」ように
         return (int)(baseDist * pathNoise);
     };
 
@@ -68,8 +68,8 @@ void Com::findPath(vector<vector<int>>& map, int gridW, int gridH) {
                 int tile = map[nx][ny];
                 if (tile == 0 || tile == 8 || (tile >= 10 && tile <= 17)) {
                     
-                    // ★改善点3: 過去に通った場所（history）はコストを高くする
-                    // これにより「行ったり来たり」のループをアルゴリズムレベルで絶対に防ぎます
+                    // 過去に通った場所（history）はコストを高くする
+                    // これにより「行ったり来たり」のループを防ぐ
                     int moveCost = 10;
                     for (auto& histPos : history) {
                         if ((int)histPos.x == nx && (int)histPos.y == ny) {
@@ -109,10 +109,10 @@ void Com::update(int tilesize, vector<vector<int>>& mapData, int gridW, int grid
 
     if (now - lastMoveTime < currentInterval) return;
 
-    // ★改善点4: 「常に最新のゴールを追いかける」のをやめる
+    // 「常に最新のゴールを追いかける」のをやめる
     // currentPath がまだ残っている（＝まだ迷いながら歩いている途中）なら、
-    // クールダウン（pathfindCooldown）が明けるまではプレイヤーの位置が変わっても経路を再計算しない。
-    // これにより、プレイヤーが行き止まりに急に方向転換しても、COMは古いルートを数歩進むため「遅れ」が生まれます。
+    // クールダウン（pathfindCooldown）が明けるまではプレイヤーの位置が変わっても経路を再計算しない
+    // これにより、プレイヤーが行き止まりに急に方向転換しても、COMは古いルートを数歩進むため「遅れ」が生じる
     if (currentPath.empty() || (now - lastPathfindTime > pathfindCooldown && currentPath.size() > 5)) {
         findPath(mapData, gridW, gridH);
         lastPathfindTime = now; // 再計算時間を記録
@@ -159,7 +159,7 @@ void Com::drawFace(float screenX, float screenY, float w, float h, ofColor color
         float cropH = sh * 0.6f;
         ofSetColor(color);
         // 指定された座標を中心に、頭の部分を切り出して描画
-        // (0,0) を基準に回転させるため、引数の中心位置からサイズ w, h の半分を引いて描画します
+        // (0,0) を基準に回転させるため、引数の中心位置からサイズ w, h の半分を引いて描画
         playerSheet.drawSubsection(screenX - w / 2.0f, screenY - h / 2.0f, w, h, sx, sy, sw, cropH);
     }
 }
