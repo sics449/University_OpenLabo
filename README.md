@@ -41,4 +41,5 @@ Enterキー:白ボタン
 - bgm:フリーBGM・音楽素材MusMus https://musmus.main.jp
 - マップ素材、アイコン等:DOT ILLUST
 - キャラクター素材、アイコン等:ぴぽや https://pipoya.net/
+
 なお、sougen.pngについては研究室内で配布されたものです。
