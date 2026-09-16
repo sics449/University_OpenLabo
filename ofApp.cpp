@@ -5058,23 +5058,7 @@ void ofApp::calculateDistanceMap() {
 }
 
 //--------------------------------------------
-void ofApp::sendText2server(string txt){
-    string com = "curl -s -m 3";
-    string server = "'http://colors.ise.ibaraki.ac.jp/IoTproj/log.php?";
-    string auth = "-u 'iotproj:BrVQxevZ'";
-    string who = "who=";
-    string ID = "ID=";
-    
-    who += "tanizawa";
-    ID = ID + "oFgame(" + __DATE__ + "/" __TIME__ + ")"; // ビルド日時を追加
-    ofStringReplace(who, " ", "%20");
-    ofStringReplace( ID, " ", "%20" );
-    ofStringReplace( txt, " ", "%20" );
-    
-    string fullURL = com + " " + auth + " " + server + who +"&"+ ID +"&line="+txt+"'&";
-    cout << fullURL << endl;
-    ofSystem( fullURL );
-}
+
 
 //--------------------------------------------
 float ofApp::textGrow(string text){
