@@ -300,7 +300,7 @@ class ofApp : public ofBaseApp{
         float textGrowbig(string text);
     
         // ログ関連 ------------------------------
-        void sendText2server( string txt ); // サーバに飛ばすやつ
+        
         GameState state;
         PlayLogger logger;            // ログ管理の専門窓口（インスタンス）
         ofVec2f lastPlayerPos; // 毎フレームの移動距離を計算するための一時変数
