@@ -555,9 +555,7 @@ void ofApp::update(){
             }
         }
         // 3. トラップの当たり判定（COMが踏んだか）
-        // =================================================================
-        // 【大幅修正】複数トラップの更新・当たり判定・足止め処理
-        // =================================================================
+        
         uint64_t nowTime = ofGetElapsedTimeMillis();
 
         // COMが現在別の効果（フリーズアイテム等）で止まっていない場合のみ、トラップの踏み判定を行う
@@ -790,7 +788,7 @@ void ofApp::update(){
                     seFinish.play();
                     currentState = RESULT_MODE;
                     logger.endAndSaveStage(true);
-                    sendText2server("--game clear--");
+                    
                     resultMessage = "ゴール!! あなたの勝ちです!";
                     goalTime = ofGetElapsedTimeMillis(); // ゴールした時刻を記録
                 }
@@ -804,7 +802,7 @@ void ofApp::update(){
                     goalTime = ofGetElapsedTimeMillis(); // 遷移タイマー開始
                     currentState = RESULT_MODE;
                     logger.endAndSaveStage(false);
-                    sendText2server("--game failed--");
+                    
                     resultMessage = "あいてがさきにゴールしました!\nあなたのまけです...";
                 }
             }
@@ -2922,12 +2920,10 @@ void ofApp::keyPressed(int key){
             
             if (selectVerticalZone == 0) {
                 // ─── 【上側：ステージ選択の決定】 ───
-                sendText2server("--start--");
+                
                 if (selectedLevel <= 2) {
                     logger.startStage(selectedLevel, 1);
-                    if(selectedLevel == 0) sendText2server("--easy play--");
-                    else if(selectedLevel == 1) sendText2server("--normal play--");
-                    else if(selectedLevel == 2) sendText2server("--hard play--");
+                    
                     
                     initGame();
                     lastPlayerPos.set(myPlayer.x, myPlayer.y);
@@ -2941,7 +2937,7 @@ void ofApp::keyPressed(int key){
                     logger.startStage(3, 1);
                     initGame();
                     lastPlayerPos.set(myPlayer.x, myPlayer.y);
-                    sendText2server("--veryhard play--");
+                    
                     currentState = MAP_MODE;
                     previousState = MAP_MODE;
                     isCountingDown = true;
@@ -2954,7 +2950,7 @@ void ofApp::keyPressed(int key){
                     selectedLevel = 3;
                     initGame();
                     //【左側：れんしゅうの開始処理】
-                    sendText2server("--start tutorial--");
+                    
                     previousModeBeforeTutorial = currentState;
                     currentState = TUTORIAL_MODE;
                     previousState = TUTORIAL_MODE;
@@ -3219,7 +3215,7 @@ void ofApp::keyPressed(int key){
         if (key == OF_KEY_RETURN) {
             seChoose.play();
             if (summaryCursor == 0) { // RETRY
-                sendText2server("--restart--");
+                
                 initGame();
                 currentState = MAP_MODE;
             } else if (summaryCursor == 1) { // DIFFICULTY
@@ -3234,7 +3230,7 @@ void ofApp::keyPressed(int key){
                 inputHistory.clear();     // マップセレクト等のコマンド履歴を消去
                 showCustomMode = false;
                 isSecretLevelUnlocked = false;
-                sendText2server("--quit--");
+                
             }
         }
     }
